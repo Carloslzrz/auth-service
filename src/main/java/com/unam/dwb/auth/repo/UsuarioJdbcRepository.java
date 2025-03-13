@@ -19,16 +19,14 @@ public class UsuarioJdbcRepository {
 	public Optional<Usuario> findByUsername(String username) {
 		String sql = "SELECT nombre_usuario, correo FROM dwb.usuario WHERE nombre_usuario = ?";
 		
-		List<Usuario> resultadoQuery = jdbcTemplate.query(sql, new Object[] {username},
+		List<Usuario> resultadoQuery = jdbcTemplate.query(sql,
 				(rs, row) -> new Usuario(
 						rs.getString("nombre_usuario"),
 						rs.getString("correo")
-						));
+						),
+				username);
 		
 		return resultadoQuery.stream().findFirst();
-		
-		
 	}
-	
 
 }

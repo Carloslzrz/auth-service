@@ -3,6 +3,8 @@ package com.unam.dwb.auth.domain;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -22,6 +24,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "usuario")
+@JsonInclude(Include.NON_EMPTY)
 public class Usuario implements Serializable {
 	
 	private static final long serialVersionUID = 3859609465552592790L;
