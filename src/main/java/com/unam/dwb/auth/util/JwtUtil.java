@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -14,13 +16,19 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class JwtUtil {
 
     private final String SECRET_KEY = "ContrasenaSuperSegura";
+    
+    @Value("${system.hostname}")
+    private String hostname;
 
-    public String generateToken(String username, List<String> roles) {
+    public String generateToken(UserDetails userDetails, String correo) {
         return Jwts.builder()
-                .setSubject(username)
-                .claim("roles", roles)
-                .setIssuedAt(new Date())
+        		.claim("email", correo)
+        		.claim("roles", userDetails.getAuthorities())
+        		.setIssuer("http://" + hostname)
+        		.setSubject(userDetails.getUsername())
+                .setAudience("http://" + hostname)
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
@@ -36,7 +44,7 @@ public class JwtUtil {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public List<String> extractRoles(String token) {
+	public List<String> extractPermisos(String token) {
         return extractClaims(token).get("roles", List.class);
     }
 

@@ -1,13 +1,16 @@
 server:
   port: 8081
 
+system:
+  hostname: localhost
+
 spring:
   application:
     name: servicio-autenticacion
   datasource:
     url: jdbc:mysql://localhost:3306/dwb
     password: Hola$123., 
-    username: carlos 
+    username: TestWS 
   jpa:
     open-in-view: false
     show-sql: true

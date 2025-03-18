@@ -1,5 +1,7 @@
 package com.unam.dwb.auth.model.request;
 
+import com.unam.dwb.auth.model.request.validation.AuthRequestConstraint;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -13,6 +15,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@AuthRequestConstraint
 public class AuthRequest {
 	
 	@NotBlank

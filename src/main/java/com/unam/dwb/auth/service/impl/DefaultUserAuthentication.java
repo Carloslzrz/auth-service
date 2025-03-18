@@ -1,17 +1,47 @@
 package com.unam.dwb.auth.service.impl;
 
-import com.unam.dwb.auth.model.request.AuthRequest;
-import com.unam.dwb.auth.model.response.AuthResponse;
-import com.unam.dwb.auth.service.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
-import jakarta.validation.Valid;
+import com.unam.dwb.auth.domain.Usuario;
+import com.unam.dwb.auth.repo.UsuarioJpaRepository;
 
-public class DefaultUserAuthentication implements AuthService {
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class DefaultUserAuthentication implements UserDetailsService {
+	
+	@Autowired
+	private UsuarioJpaRepository usuarioJpaRepository;
 
 	@Override
-	public AuthResponse autenticaUsuario(@Valid AuthRequest request) {
-		// TODO Auto-generated method stub
-		return null;
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		Usuario usuario = usuarioJpaRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Usuario inexistente"));
+		
+		log.info("Usuario existente: {}", usuario);
+		
+		return usuario;
 	}
+
+	/*
+	
+	@Override
+	public AuthAPIResponse autenticaUsuario(@Valid AuthRequest request) {
+		log.info("Autenticando usuario");
+		
+		Optional<Usuario> usuario;
+		
+		if(StringUtils.hasLength(request.getCorreo())) {
+			usuario = usuarioJdbcRepository.findByCorreoCredential(request.getCorreo(), passwordEncoder.encode(request.getContrasena()));
+		}else {
+			usuario = usuarioJdbcRepository.findByUsernameCredential(request.getNombreUsuario(), passwordEncoder.encode(request.getContrasena()));
+		}
+		
+	}
+	*/
 
 }

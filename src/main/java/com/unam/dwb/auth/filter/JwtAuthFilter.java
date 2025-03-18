@@ -39,11 +39,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
         String username = jwtUtil.extractUsername(token);
-        List<String> roles = jwtUtil.extractRoles(token);
+        List<String> permisos = jwtUtil.extractPermisos(token);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = User.withUsername(username)
-                    .roles(roles.toArray(new String[0]))
+                    .roles(permisos.toArray(new String[0]))
                     .build();
 
             UsernamePasswordAuthenticationToken authToken = 

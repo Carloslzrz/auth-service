@@ -1,6 +1,7 @@
 package com.unam.dwb.auth.model.response;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -17,15 +18,15 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(Include.NON_NULL)
-public class UsuarioResponse{
+@JsonInclude(Include.NON_EMPTY)
+public class AuthAPIResponse {
 	
-	private String nombres;
-	private String apellidos;
-	private String nombreUsuario;
-	private String correo;
-	private Set<String> roles;
-    private Boolean esActivo;
+	private String token;
+	private String fechaHora;
+	private List<String> detalles;
+	private List<UsuarioResponse> usuarios;
+	
+	private InfoPaginacion infoPaginacion;
 	
 	@Override
     public String toString() {
@@ -37,5 +38,13 @@ public class UsuarioResponse{
         	return super.toString(); 
         }
     }
+
+	public void agregaUsuario(UsuarioResponse usuario) {
+		if(this.usuarios == null)
+			this.usuarios = new ArrayList<>();
+		
+		this.usuarios.add(usuario);
+		
+	}
 
 }

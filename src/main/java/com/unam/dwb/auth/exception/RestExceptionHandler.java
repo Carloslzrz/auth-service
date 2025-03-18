@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import com.unam.dwb.auth.model.response.AuthResponse;
+import com.unam.dwb.auth.model.response.AuthAPIResponse;
 import com.unam.dwb.auth.util.Globales;
 
 import org.springframework.http.HttpStatus;
@@ -37,10 +37,10 @@ public class RestExceptionHandler {
 
 	@ExceptionHandler(value = {MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class)))
-	protected ResponseEntity<AuthResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
+	@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthAPIResponse.class)))
+	protected ResponseEntity<AuthAPIResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
 
-		AuthResponse response = new AuthResponse();
+		AuthAPIResponse response = new AuthAPIResponse();
 
 		log.error(MALFORMED_REQUEST);
 		generaElementosComunesRespuesta(ex, response); 
@@ -52,10 +52,10 @@ public class RestExceptionHandler {
 	
 	@ExceptionHandler(value = {ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class)))
-	protected ResponseEntity<AuthResponse> handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {
+	@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthAPIResponse.class)))
+	protected ResponseEntity<AuthAPIResponse> handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {
 
-		AuthResponse response = new AuthResponse();
+		AuthAPIResponse response = new AuthAPIResponse();
 
 		log.error(MALFORMED_REQUEST);
 		generaElementosComunesRespuesta(ex, response);
@@ -66,10 +66,10 @@ public class RestExceptionHandler {
 	
 	@ExceptionHandler(value = {HttpMessageNotReadableException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class)))
-	protected ResponseEntity<AuthResponse> handleMissingParameterException(HttpMessageNotReadableException ex, WebRequest request) {
+	@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthAPIResponse.class)))
+	protected ResponseEntity<AuthAPIResponse> handleMissingParameterException(HttpMessageNotReadableException ex, WebRequest request) {
 
-		AuthResponse response = new AuthResponse();
+		AuthAPIResponse response = new AuthAPIResponse();
 
 		log.error(MALFORMED_REQUEST);
 		generaElementosComunesRespuesta(ex, response);
@@ -80,10 +80,10 @@ public class RestExceptionHandler {
 	
 	@ExceptionHandler(value = {MissingServletRequestParameterException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class)))
-	protected ResponseEntity<AuthResponse> handleMissingParameterException(MissingServletRequestParameterException ex, WebRequest request) {
+	@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthAPIResponse.class)))
+	protected ResponseEntity<AuthAPIResponse> handleMissingParameterException(MissingServletRequestParameterException ex, WebRequest request) {
 
-		AuthResponse response = new AuthResponse();
+		AuthAPIResponse response = new AuthAPIResponse();
 
 		log.error(MALFORMED_REQUEST);
 		generaElementosComunesRespuesta(ex, response);
@@ -94,10 +94,10 @@ public class RestExceptionHandler {
 		
 	@ExceptionHandler(value = {Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class)))
-	protected ResponseEntity<AuthResponse> handleGlobalException(Exception ex, WebRequest request) {
+	@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthAPIResponse.class)))
+	protected ResponseEntity<AuthAPIResponse> handleGlobalException(Exception ex, WebRequest request) {
 
-		AuthResponse response = new AuthResponse();
+		AuthAPIResponse response = new AuthAPIResponse();
 
 		log.error(INTERNAL_SERVER_ERROR);
 		generaElementosComunesRespuesta(ex, response);
@@ -106,27 +106,27 @@ public class RestExceptionHandler {
 		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	private void generaElementosComunesRespuesta(HttpMessageNotReadableException ex, AuthResponse response) {		
+	private void generaElementosComunesRespuesta(HttpMessageNotReadableException ex, AuthAPIResponse response) {		
 		response.setFechaHora(Globales.formatDate(new Date()));
 		response.setDetalles(Arrays.asList(Globales.MSG_BAD_REQUEST, ex.getMessage()));		
 	}
 	
-	private void generaElementosComunesRespuesta(Exception ex, AuthResponse response) {		
+	private void generaElementosComunesRespuesta(Exception ex, AuthAPIResponse response) {		
 		response.setFechaHora(Globales.formatDate(new Date()));
 		response.setDetalles(Arrays.asList(Globales.MSG_INTERNAL_SERVER_ERROR, ex.getMessage()));		
 	}
 	
-	private void generaElementosComunesRespuesta(MissingServletRequestParameterException ex, AuthResponse response) {		
+	private void generaElementosComunesRespuesta(MissingServletRequestParameterException ex, AuthAPIResponse response) {		
 		response.setFechaHora(Globales.formatDate(new Date()));
 		response.setDetalles(Arrays.asList(Globales.MSG_BAD_REQUEST, ex.getMessage()));		
 	}
 	
-	private void generaElementosComunesRespuesta(ConstraintViolationException ex, AuthResponse response) {		
+	private void generaElementosComunesRespuesta(ConstraintViolationException ex, AuthAPIResponse response) {		
 		response.setFechaHora(Globales.formatDate(new Date()));
 		response.setDetalles(Arrays.asList(Globales.MSG_BAD_REQUEST, ex.getMessage()));		
 	}
 
-	private void generaElementosComunesRespuesta(MethodArgumentNotValidException ex, AuthResponse response) {
+	private void generaElementosComunesRespuesta(MethodArgumentNotValidException ex, AuthAPIResponse response) {
 
 		List<FieldError> fieldErrors = new ArrayList<>(ex.getBindingResult().getFieldErrors());
 

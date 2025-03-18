@@ -2,14 +2,20 @@ package com.unam.dwb.auth.service.impl;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.unam.dwb.auth.domain.Usuario;
 import com.unam.dwb.auth.model.request.UsuarioRequest;
+import com.unam.dwb.auth.model.response.AuthAPIResponse;
+import com.unam.dwb.auth.model.response.InfoPaginacion;
 import com.unam.dwb.auth.model.response.UsuarioResponse;
 import com.unam.dwb.auth.repo.UsuarioJdbcRepository;
 import com.unam.dwb.auth.repo.UsuarioJpaRepository;
@@ -33,54 +39,83 @@ public class DefaultUsuarioService implements UsuarioService {
 	private BCryptPasswordEncoder passwordEncoder;
 
 	@Override
-	public UsuarioResponse registraUsuario(@Valid UsuarioRequest request) {
+	public AuthAPIResponse registraUsuario(@Valid UsuarioRequest request) {
 		log.info("Se intenta registrar nuevo usuario");
 
-		Boolean exitoPrecondiciones = verificaPrecondiciones(request);
+		Boolean exitoPrecondiciones = verificaPrecondicionesRegistro(request);
 
 		if(!exitoPrecondiciones.booleanValue()) {
-			UsuarioResponse usuarioExistenteResponse = new UsuarioResponse(null);
+			AuthAPIResponse usuarioExistenteResponse = new AuthAPIResponse();
 			usuarioExistenteResponse.setDetalles(Arrays.asList("Registro de usuario fallido. Usuario ya existente"));
 			usuarioExistenteResponse.setFechaHora(Globales.formatDate(new Date()));
 			usuarioExistenteResponse.setToken(null);
-			usuarioExistenteResponse.setUsuario(null);
 			return usuarioExistenteResponse;
 		}	
 
-		Usuario usuarioNuevo = new Usuario();
-		usuarioNuevo.setApellidos(request.getApellidos());
-		usuarioNuevo.setAutoridades(null);
-		usuarioNuevo.setContrasena(passwordEncoder.encode(request.getContrasena()));
-		usuarioNuevo.setCorreo(request.getCorreo());
-		usuarioNuevo.setEsActivo(true);
-		usuarioNuevo.setNombres(request.getNombres());
-		usuarioNuevo.setNombreUsuario(request.getNombreUsuario());
-		usuarioNuevo.setRol(null);
-
+		Usuario usuarioNuevo = usuarioRequestToUsuario(request);
 		Usuario usuario = usuarioJpaRepository.save(usuarioNuevo);
 		
-		UsuarioResponse usuarioCreadoResponse = new UsuarioResponse(null);
+		AuthAPIResponse usuarioCreadoResponse = new AuthAPIResponse();
 		usuarioCreadoResponse.setDetalles(Arrays.asList("Usuario creado exitosamente"));
 		usuarioCreadoResponse.setFechaHora(Globales.formatDate(new Date()));
 		usuarioCreadoResponse.setToken(null);
-		usuarioCreadoResponse.setUsuario(usuario);
-		
+		usuarioCreadoResponse.agregaUsuario(usuarioToUsuarioResponse(usuario));
 		log.info("Usuario registrado"); 
 		return usuarioCreadoResponse;
 
 	}
 
-	private Boolean verificaPrecondiciones(@Valid UsuarioRequest request) {
+	@Override
+	public AuthAPIResponse consultaUsuarios(Integer pagina, Integer tam) {
+		log.info("Consultando usuarios registrados");
+		
+		AuthAPIResponse response = new AuthAPIResponse();
+	
+		Pageable pageable = PageRequest.of(pagina, tam);
+		Page<Usuario> paginaUsuarios = usuarioJpaRepository.findAll(pageable);
+		List<Usuario> usuarios = paginaUsuarios.getContent();
+		
+		response.setUsuarios(usuarios.stream().map(this::usuarioToUsuarioResponse).toList());
+		response.setInfoPaginacion(new InfoPaginacion(pagina, paginaUsuarios.hasNext(), paginaUsuarios.hasPrevious(), paginaUsuarios.getTotalPages(), paginaUsuarios.getSize(), paginaUsuarios.getTotalElements()));
+		
+		log.info("Usuarios recuperados: {}", usuarios.size());
+		log.info("Termina consulta de usuarios registrados");
+		
+		return response;
+	}	
+	
+	private UsuarioResponse usuarioToUsuarioResponse(Usuario usuario) {
+		UsuarioResponse usuarioResponse = new UsuarioResponse();
+		usuarioResponse.setApellidos(usuario.getApellidos());
+		usuarioResponse.setCorreo(usuario.getCorreo());
+		usuarioResponse.setEsActivo(usuario.getEsActivo());
+		usuarioResponse.setNombres(usuario.getNombres());
+		usuarioResponse.setNombreUsuario(usuario.getUsername());
+		usuarioResponse.setRoles(usuario.getRoles());
+		return usuarioResponse;
+	}
+	
+	private Usuario usuarioRequestToUsuario(UsuarioRequest usuarioRequest) {
+		Usuario usuarioNuevo = new Usuario();
+		usuarioNuevo.setApellidos(usuarioRequest.getApellidos());
+		usuarioNuevo.setPassword(passwordEncoder.encode(usuarioRequest.getContrasena()));
+		usuarioNuevo.setCorreo(usuarioRequest.getCorreo());
+		usuarioNuevo.setEsActivo(true);
+		usuarioNuevo.setNombres(usuarioRequest.getNombres());
+		usuarioNuevo.setUsername(usuarioRequest.getNombreUsuario());
+		usuarioNuevo.setRoles(null);
+		return usuarioNuevo;
+	}
+	
+	private Boolean verificaPrecondicionesRegistro(@Valid UsuarioRequest request) {
 		Optional<Usuario> byCorreo = usuarioJpaRepository.findByCorreo(request.getCorreo());
 		Optional<Usuario> byUsername = usuarioJdbcRepository.findByUsername(request.getNombreUsuario());
 
 		if(byCorreo.isPresent() || byUsername.isPresent()) {
-			log.error("Usuario previamente registrado. No se puede registrar.");
+			log.error("Usuario previamente registrado. No se puede continuar.");
 			return false;
 		}
-
 		return true;
-
-	}	
+	}
 
 }
