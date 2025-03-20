@@ -2,6 +2,7 @@ package com.unam.dwb.auth.service.impl;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.unam.dwb.auth.constants.Rol;
 import com.unam.dwb.auth.domain.Usuario;
 import com.unam.dwb.auth.model.request.UsuarioRequest;
 import com.unam.dwb.auth.model.response.AuthAPIResponse;
@@ -53,12 +55,14 @@ public class DefaultUsuarioService implements UsuarioService {
 		}	
 
 		Usuario usuarioNuevo = usuarioRequestToUsuario(request);
+		HashSet<String> roles = new HashSet<String>();
+		roles.add(Rol.ROLE_USER.getNombreRol());
+		usuarioNuevo.setRoles(roles);
 		Usuario usuario = usuarioJpaRepository.save(usuarioNuevo);
 		
 		AuthAPIResponse usuarioCreadoResponse = new AuthAPIResponse();
 		usuarioCreadoResponse.setDetalles(Arrays.asList("Usuario creado exitosamente"));
 		usuarioCreadoResponse.setFechaHora(Globales.formatDate(new Date()));
-		usuarioCreadoResponse.setToken(null);
 		usuarioCreadoResponse.agregaUsuario(usuarioToUsuarioResponse(usuario));
 		log.info("Usuario registrado"); 
 		return usuarioCreadoResponse;

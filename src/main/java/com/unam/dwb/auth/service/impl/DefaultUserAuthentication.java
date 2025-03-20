@@ -27,21 +27,4 @@ public class DefaultUserAuthentication implements UserDetailsService {
 		return usuario;
 	}
 
-	/*
-	
-	@Override
-	public AuthAPIResponse autenticaUsuario(@Valid AuthRequest request) {
-		log.info("Autenticando usuario");
-		
-		Optional<Usuario> usuario;
-		
-		if(StringUtils.hasLength(request.getCorreo())) {
-			usuario = usuarioJdbcRepository.findByCorreoCredential(request.getCorreo(), passwordEncoder.encode(request.getContrasena()));
-		}else {
-			usuario = usuarioJdbcRepository.findByUsernameCredential(request.getNombreUsuario(), passwordEncoder.encode(request.getContrasena()));
-		}
-		
-	}
-	*/
-
 }

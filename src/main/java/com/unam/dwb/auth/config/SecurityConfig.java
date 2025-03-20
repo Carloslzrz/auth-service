@@ -1,26 +1,47 @@
 package com.unam.dwb.auth.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.unam.dwb.auth.filter.JwtAuthFilter;
 import com.unam.dwb.auth.service.impl.DefaultUserAuthentication;
+
+
 
 @Configuration
 public class SecurityConfig {
 	
-	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	@Autowired
+	private JwtAuthFilter jwtFilter;
 	
-		http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-		.csrf(csrf -> csrf.disable())
+	@Bean
+	SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfig corsConfig) throws Exception {
+	
+		http.csrf(AbstractHttpConfigurer::disable)
+		.authorizeHttpRequests(
+				auth -> auth
+				.requestMatchers("/error", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/info", "/actuator/health").permitAll()
+				.requestMatchers(HttpMethod.POST, "/usuario").permitAll()
+				.requestMatchers(HttpMethod.POST, "/login").permitAll()
+				.requestMatchers(HttpMethod.GET, "/usuario").hasAuthority("ADMIN")
+				)
+		.cors(cors -> cors.configurationSource(corsConfig))
+		.httpBasic(Customizer.withDefaults())
 		.formLogin(form -> form.disable())
-		.httpBasic(httpBasic -> httpBasic.disable());
+		.sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+		.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 			
 		return http.build();
 	}
@@ -37,22 +58,5 @@ public class SecurityConfig {
 	BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}	
-	
-	/**
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf().disable()
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/usuario/**").hasAnyRole("CUSTOMER", "ADMIN") 
-                .requestMatchers("/user/**").hasRole("ADMIN") 
-                .anyRequest().authenticated()
-            )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
-    **/
 
 }

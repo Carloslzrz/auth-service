@@ -1,7 +1,10 @@
 package com.unam.dwb.auth.util;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +18,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY = "ContrasenaSuperSegura";
+    private final String SECRET_KEY = "ContrasenaSuperSeguraContrasenaSuperSeguraContrasenaSuperSeguraContrasenaSuperSeguraContrasenaSuperSegura";
     
     @Value("${system.hostname}")
     private String hostname;
@@ -44,8 +47,8 @@ public class JwtUtil {
         return extractClaim(token, Claims::getSubject);
     }
 
-	public List<String> extractPermisos(String token) {
-        return extractClaims(token).get("roles", List.class);
+	public List<HashMap<String, String>> extractPermisos(String token) {
+         return extractClaims(token).get("roles", List.class);
     }
 
     public boolean isTokenValid(String token, String username) {

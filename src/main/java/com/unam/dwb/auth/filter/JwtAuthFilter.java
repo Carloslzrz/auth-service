@@ -1,8 +1,8 @@
 package com.unam.dwb.auth.filter;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
-
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -39,11 +39,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
         String username = jwtUtil.extractUsername(token);
-        List<String> permisos = jwtUtil.extractPermisos(token);
+        List<HashMap<String, String>> permisos = jwtUtil.extractPermisos(token);
+        
+        List<String> permisosList = permisos.stream().map(i -> i.get("authority")).toList();
+        
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = User.withUsername(username)
-                    .roles(permisos.toArray(new String[0]))
+            		.authorities(permisosList.toArray(new String[0]))
                     .build();
 
             UsernamePasswordAuthenticationToken authToken = 

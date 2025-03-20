@@ -1,19 +1,17 @@
 package com.unam.dwb.auth.constants;
 
-import static com.unam.dwb.auth.constants.Autoridades.ADMIN_AUTHORITIES;
-import static com.unam.dwb.auth.constants.Autoridades.USER_AUTHORITIES;;
 
 public enum Rol {
-    ROLE_USER(USER_AUTHORITIES),
-    ROLE_ADMIN(ADMIN_AUTHORITIES);
+    ROLE_USER("CUSTOMER"),
+    ROLE_ADMIN("ADMIN");
 
-    private String[] authorities;
+    private String nombreRol;
 
-    Rol(String... authorities) {
-        this.authorities = authorities;
+    Rol(String nombreRol) {
+        this.nombreRol = nombreRol;
     }
 
-    public String[] getAuthorities() {
-        return authorities;
+    public String getNombreRol() {
+        return nombreRol;
     }
 }
