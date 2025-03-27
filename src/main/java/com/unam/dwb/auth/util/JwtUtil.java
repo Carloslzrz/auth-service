@@ -2,14 +2,13 @@ package com.unam.dwb.auth.util;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.unam.dwb.auth.domain.Usuario;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -23,12 +22,13 @@ public class JwtUtil {
     @Value("${system.hostname}")
     private String hostname;
 
-    public String generateToken(UserDetails userDetails, String correo) {
+    public String generateToken(Usuario usuario) {
         return Jwts.builder()
-        		.claim("email", correo)
-        		.claim("roles", userDetails.getAuthorities())
+        		.claim("id", usuario.getId())
+        		.claim("email", usuario.getCorreo())
+        		.claim("roles", usuario.getAuthorities())
         		.setIssuer("http://" + hostname)
-        		.setSubject(userDetails.getUsername())
+        		.setSubject(usuario.getUsername())
                 .setAudience("http://" + hostname)
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .setIssuedAt(new Date())

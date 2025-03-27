@@ -1,7 +1,6 @@
 package com.unam.dwb.auth.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,7 @@ public class DefaultUserAuthentication implements UserDetailsService {
 	private UsuarioJpaRepository usuarioJpaRepository;
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public Usuario loadUserByUsername(String username) throws UsernameNotFoundException {
 		Usuario usuario = usuarioJpaRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Usuario inexistente"));
 		
 		log.info("Usuario existente: {}", usuario);

@@ -8,11 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.unam.dwb.auth.domain.Usuario;
 import com.unam.dwb.auth.model.request.AuthRequest;
 import com.unam.dwb.auth.model.response.AuthAPIResponse;
 import com.unam.dwb.auth.service.impl.DefaultUserAuthentication;
@@ -56,9 +56,9 @@ public class AuthController {
 		
 		response.setDetalles(Arrays.asList("Autenticación exitosa"));
 		
-		UserDetails user = userAuthenticationService.loadUserByUsername(request.getNombreUsuario());
+		Usuario usuario = userAuthenticationService.loadUserByUsername(request.getNombreUsuario());
 		
-		String jwt = jwtUtil.generateToken(user, request.getCorreo());
+		String jwt = jwtUtil.generateToken(usuario);
 		
 		response.setToken(jwt);
 		response.setFechaHora(Globales.formatDate(new Date()));
