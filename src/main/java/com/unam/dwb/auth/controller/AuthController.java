@@ -2,20 +2,22 @@ package com.unam.dwb.auth.controller;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.unam.dwb.auth.domain.Usuario;
+import com.unam.dwb.auth.filter.UsernameOrCorreoAuthenticationToken;
 import com.unam.dwb.auth.model.request.AuthRequest;
 import com.unam.dwb.auth.model.response.AuthAPIResponse;
-import com.unam.dwb.auth.service.impl.DefaultUserAuthentication;
 import com.unam.dwb.auth.util.Globales;
 import com.unam.dwb.auth.util.JwtUtil;
 
@@ -39,8 +41,6 @@ public class AuthController {
 	@Autowired
 	private JwtUtil jwtUtil;
 	
-	@Autowired
-	private DefaultUserAuthentication userAuthenticationService;
 	
 	@PostMapping(value = ENDPOINT_AUTH_USER)
 	@Operation(summary = "Autentica un usuario", description = "Autentica un usuario y devuelve un JWT con el ROL registrado si las credenciales son válidas")
@@ -52,13 +52,18 @@ public class AuthController {
 		if(log.isDebugEnabled())
 			log.debug(REQUEST_LOG, request);
 		
-		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getNombreUsuario(), request.getContrasena()));
+		HashMap<String, String> elementosAutenticacion = new HashMap<String, String>();
+		
+		if(StringUtils.hasLength(request.getNombreUsuario()))
+			elementosAutenticacion.put("username", request.getNombreUsuario());
+		if(StringUtils.hasLength(request.getCorreo()))
+			elementosAutenticacion.put("correo", request.getCorreo());
+		
+		Authentication authenticate = authenticationManager.authenticate(new UsernameOrCorreoAuthenticationToken(elementosAutenticacion, request.getContrasena()));
 		
 		response.setDetalles(Arrays.asList("Autenticación exitosa"));
 		
-		Usuario usuario = userAuthenticationService.loadUserByUsername(request.getNombreUsuario());
-		
-		String jwt = jwtUtil.generateToken(usuario);
+		String jwt = jwtUtil.generateToken((Usuario) authenticate.getPrincipal());
 		
 		response.setToken(jwt);
 		response.setFechaHora(Globales.formatDate(new Date()));
@@ -71,3 +76,4 @@ public class AuthController {
 	}
 
 }
+

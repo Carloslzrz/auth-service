@@ -1,12 +1,13 @@
 package com.unam.dwb.auth.config;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -16,7 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.unam.dwb.auth.filter.JwtAuthFilter;
-import com.unam.dwb.auth.service.impl.DefaultUserAuthentication;
+import com.unam.dwb.auth.filter.UsernameOrCorreoAuthenticationProvider;
 
 
 
@@ -47,11 +48,8 @@ public class SecurityConfig {
 	}
 	
 	@Bean
-    AuthenticationManager authenticationManager(DefaultUserAuthentication defaultUserAuthentication) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(defaultUserAuthentication);
-        provider.setPasswordEncoder(passwordEncoder());
-        return new ProviderManager(provider);
+    AuthenticationManager authenticationManager(UsernameOrCorreoAuthenticationProvider provider) {
+        return new ProviderManager(List.of(provider));
     }
 	
 	@Bean

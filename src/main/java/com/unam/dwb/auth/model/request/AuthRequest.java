@@ -18,11 +18,9 @@ import lombok.Setter;
 @AuthRequestConstraint
 public class AuthRequest {
 	
-	@NotBlank
 	@Schema(description = "Apellidos del usuario a registrar", example = "carloslzrz")
 	private String nombreUsuario;
 	
-	@NotBlank
 	@Email
 	@Schema(description = "Correo del usuario", example = "carlos.lopez@ciencias.unam.mx")
 	private String correo;
