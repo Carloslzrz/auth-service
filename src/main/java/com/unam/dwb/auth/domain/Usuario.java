@@ -41,7 +41,7 @@ public class Usuario implements Serializable, UserDetails {
 	private static final long serialVersionUID = 3859609465552592790L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, updatable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long id;

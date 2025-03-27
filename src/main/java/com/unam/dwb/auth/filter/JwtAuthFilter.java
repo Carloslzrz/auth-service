@@ -46,6 +46,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = User.withUsername(username)
+            		.password("")
             		.authorities(permisosList.toArray(new String[0]))
                     .build();
 

@@ -58,5 +58,11 @@ public class SecurityConfig {
 	BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}	
+	
+	
+	public static void main(String[] args) {
+		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+		System.out.print(bCryptPasswordEncoder.encode("contrasenaSegura"));
+	}
 
 }

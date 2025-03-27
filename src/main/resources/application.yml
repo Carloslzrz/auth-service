@@ -10,7 +10,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/dwb
     password: Hola$123., 
-    username: TestWS 
+    username: carlos 
   jpa:
     open-in-view: false
     show-sql: true
